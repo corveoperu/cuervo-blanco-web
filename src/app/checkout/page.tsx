@@ -2,15 +2,15 @@
 import { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { createClient } from '@/utils/supabase/client';
-import { useAuth } from '@/context/AuthContext'; // IMPORTANTE
-import { UploadCloud, CheckCircle, Loader2, User, Phone, Mail, MapPin, ArrowRight, AlertTriangle } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { UploadCloud, CheckCircle, Loader2, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
   const { cart, total, clearCart } = useCart();
-  const { user, loading: authLoading } = useAuth(); // DATOS USUARIO
+  const { user, loading: authLoading } = useAuth(); 
   const supabase = createClient();
   const router = useRouter();
   
@@ -26,24 +26,25 @@ export default function CheckoutPage() {
     address: ''
   });
 
-  // PROTECCIÓN DE RUTA Y AUTORELLENO
+  // PROTECCIÓN Y AUTORELLENO
+
   useEffect(() => {
     if (!authLoading) {
       if (!user) {
-        // No logueado -> Al Login
         router.push('/auth/login');
       } else {
-        // Logueado -> Rellenar datos automáticamente
+        // SOLUCIÓN: Usamos (user as any) para saltar la restricción de TS
+        const meta = (user as any).user_metadata || {};
+        
         setFormData(prev => ({
           ...prev,
-          name: user.full_name,
-          email: user.email
+          name: meta.full_name || user.email || '', 
+          email: user.email || ''
         }));
       }
     }
   }, [user, authLoading, router]);
 
-  // Si está cargando auth o no hay usuario, mostramos pantalla de carga
   if (authLoading || !user) {
       return <div className="min-h-screen bg-black flex items-center justify-center text-[#FFD700]"><Loader2 className="animate-spin mr-2"/> Verificando sesión...</div>;
   }
@@ -55,8 +56,11 @@ export default function CheckoutPage() {
 
     setLoading(true);
     try {
+      // 1. Validamos que el ID sea válido (UUID)
+      if (!user.id) throw new Error("No se detectó el ID de usuario.");
+
       const { data: order, error: orderError } = await supabase.from('orders').insert([{
-          user_id: user.id, // ASOCIAMOS AL USUARIO REGISTRADO
+          user_id: user.id, // ID REAL DE SUPABASE
           guest_info: formData,
           total: total,
           status: 'pending',
@@ -69,7 +73,7 @@ export default function CheckoutPage() {
       const items = cart.map(item => ({
         order_id: order.id,
         product_id: item.id,
-        quantity: 1,
+        quantity: item.quantity, // CORRECCIÓN: Usar cantidad real del carrito
         price_at_purchase: item.price
       }));
 
@@ -81,7 +85,8 @@ export default function CheckoutPage() {
       clearCart();
 
     } catch (error: any) {
-      alert("Error: " + error.message);
+      console.error(error);
+      alert("Error al crear pedido: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -92,15 +97,18 @@ export default function CheckoutPage() {
     if (!e.target.files?.length || !orderId) return;
     setUploading(true);
     const file = e.target.files[0];
-    const fileName = `vouchers/${orderId}-${Date.now()}.${file.name.split('.').pop()}`;
+    const fileExt = file.name.split('.').pop();
+    const fileName = `vouchers/${orderId}-${Date.now()}.${fileExt}`;
 
     try {
       const { error: uploadError } = await supabase.storage.from('cuervo-files').upload(fileName, file);
       if (uploadError) throw uploadError;
       
       const { data: urlData } = supabase.storage.from('cuervo-files').getPublicUrl(fileName);
-      await supabase.from('orders').update({ payment_proof: urlData.publicUrl }).eq('id', orderId);
       
+      const { error: updateError } = await supabase.from('orders').update({ payment_proof: urlData.publicUrl }).eq('id', orderId);
+      if (updateError) throw updateError;
+
       setStep(3);
     } catch (error: any) {
       alert("Error subiendo imagen: " + error.message);
@@ -109,7 +117,6 @@ export default function CheckoutPage() {
     }
   };
 
-  // RENDERIZADO (VISTA 3: ÉXITO)
   if (step === 3) return (
       <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-6 animate-in fade-in">
         <div className="bg-[#111] border border-[#222] p-12 rounded-3xl max-w-lg w-full text-center shadow-2xl">
@@ -121,7 +128,6 @@ export default function CheckoutPage() {
       </div>
   );
 
-  // RENDERIZADO (VISTA 2: PAGO) - Igual que antes pero abreviado
   if (step === 2) return (
       <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-4 animate-in fade-in">
         <div className="bg-[#111] border border-[#222] p-8 rounded-3xl max-w-md w-full text-center">
@@ -137,7 +143,6 @@ export default function CheckoutPage() {
       </div>
   );
 
-  // RENDERIZADO (VISTA 1: DATOS)
   return (
     <div className="min-h-screen bg-[#050505] text-white pt-24 px-4 max-w-2xl mx-auto">
       <h1 className="text-3xl font-bold mb-8 text-[#FFD700]">Finalizar Compra</h1>

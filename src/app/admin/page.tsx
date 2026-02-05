@@ -66,8 +66,20 @@ const ProductsView = () => {
 
   const handleDelete = async (id: number) => {
     if (!confirm("⚠️ ¿Estás seguro de eliminar este producto?")) return;
-    await supabase.from('products').delete().eq('id', id);
-    fetchProducts();
+    
+    try {
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      
+      if (error) {
+        console.error("Error Supabase:", error);
+        alert("Error al borrar: " + error.message); // Esto nos dirá si es permiso
+      } else {
+        alert("Producto eliminado correctamente.");
+        fetchProducts(); // Recargamos la lista
+      }
+    } catch (err) {
+      alert("Error inesperado al borrar.");
+    }
   };
 
   const filteredProducts = products.filter(p => 

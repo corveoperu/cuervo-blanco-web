@@ -3,18 +3,21 @@ import { useCart } from '@/context/CartContext';
 import { ShoppingCart, Search, Filter, X, Star, ChevronLeft, ChevronRight, Eye, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect, useMemo } from 'react';
-import { supabase } from '@/lib/supabase'; // Importamos el cliente de Supabase
+import { createClient } from '@/utils/supabase/client'; // Importación correcta
 
-// Filtros estáticos (puedes hacerlos dinámicos luego si quieres)
+// Filtros estáticos
 const ALL_CATEGORIES = ["Robótica", "Microcontroladores", "Herramientas", "Impresión 3D", "Componentes"];
 const ALL_BRANDS = ["Arduino", "Raspberry Pi", "Fluke", "Creality", "Weller", "Espressif"];
 
 export default function TiendaPage() {
+  // 1. CORRECCIÓN: INICIALIZAR EL CLIENTE AQUÍ
+  const supabase = createClient();
+  
   const { addToCart } = useCart();
   
   // --- ESTADO DE DATOS (BD) ---
-  const [products, setProducts] = useState<any[]>([]); // Productos traídos de Supabase
-  const [loading, setLoading] = useState(true); // Estado de carga
+  const [products, setProducts] = useState<any[]>([]); 
+  const [loading, setLoading] = useState(true); 
 
   // --- ESTADOS DE FILTROS ---
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,14 +30,15 @@ export default function TiendaPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  // 1. CARGAR PRODUCTOS DESDE SUPABASE
+  // 2. CARGAR PRODUCTOS DESDE SUPABASE
   useEffect(() => {
     async function fetchProducts() {
       try {
         const { data, error } = await supabase
           .from('products')
           .select('*')
-          .eq('is_active', true); // Solo mostramos productos activos
+          // .eq('is_active', true) <-- Descomenta esto si tienes esa columna en tu DB
+          .order('id', { ascending: false });
 
         if (error) throw error;
         if (data) setProducts(data);
@@ -45,9 +49,9 @@ export default function TiendaPage() {
       }
     }
     fetchProducts();
-  }, []);
+  }, [supabase]); // Agregamos supabase como dependencia
 
-  // 2. LÓGICA DE FILTRADO (Client-Side sobre los datos descargados)
+  // 3. LÓGICA DE FILTRADO (Client-Side)
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
       const matchSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());

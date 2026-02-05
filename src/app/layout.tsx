@@ -2,13 +2,16 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/shared/Navbar';
+import Footer from '@/components/shared/Footer'; // 1. IMPORTAR FOOTER (Asegúrate que exista el archivo)
+import CartSidebar from '@/components/shared/CartSidebar'; 
+import SmartRaven from '@/components/shared/SmartRaven'; // 2. IMPORTAR CUERVO
 import { CartProvider } from '@/context/CartContext';
-import { AuthProvider } from '@/context/AuthContext'; // IMPORTANTE
+import { AuthProvider } from '@/context/AuthContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Cuervo Blanco | Ingeniería Electrónica',
+  title: 'Corveo Perú | Ingeniería Electrónica', // 3. CAMBIO DE NOMBRE
   description: 'Tienda de electrónica, desarrollo de proyectos y reparaciones.',
 };
 
@@ -20,10 +23,17 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={inter.className}>
-        <AuthProvider> {/* 1. AUTH PRIMERO */}
-          <CartProvider> {/* 2. CART SEGUNDO */}
+        <AuthProvider>
+          <CartProvider>
             <Navbar />
-            {children}
+            <CartSidebar />
+            <SmartRaven /> {/* 4. AGREGAR CUERVO AQUÍ */}
+            
+            <main className="min-h-screen">
+              {children}
+            </main>
+
+            <Footer /> {/* 5. AGREGAR FOOTER AQUÍ */}
           </CartProvider>
         </AuthProvider>
       </body>
