@@ -1,0 +1,46 @@
+[
+  {
+    "id": 1,
+    "name": "Kit Arduino Avanzado",
+    "price": 450,
+    "stock": 15,
+    "category": "Robótica",
+    "brand": "Arduino",
+    "image": "https://images.unsplash.com/photo-1555664424-778a6902201b?auto=format&fit=crop&q=80&w=400",
+    "desc": "Kit completo para iniciarse en la robótica.",
+    "reviews": [{},{},{}] 
+  },
+  {
+    "id": 2,
+    "name": "Raspberry Pi 5 8GB",
+    "price": 380,
+    "stock": 5,
+    "category": "Microcontroladores",
+    "brand": "Raspberry Pi",
+    "image": "https://images.unsplash.com/photo-1629654297299-c8506221ca97?auto=format&fit=crop&q=80&w=400",
+    "desc": "La computadora de placa reducida más potente.",
+    "reviews": [{}]
+  },
+  {
+    "id": 3,
+    "name": "Multímetro Fluke 179",
+    "price": 1200,
+    "stock": 3,
+    "category": "Herramientas",
+    "brand": "Fluke",
+    "image": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=400",
+    "desc": "Precisión True RMS para profesionales.",
+    "reviews": [{},{}]
+  },
+  {
+    "id": 4,
+    "name": "Impresora 3D Ender 3 V2",
+    "price": 1100,
+    "stock": 8,
+    "category": "Impresión 3D",
+    "brand": "Creality",
+    "image": "https://images.unsplash.com/photo-1631541909061-71e349d1f203?auto=format&fit=crop&q=80&w=400",
+    "desc": "Impresión de alta calidad y estructura robusta.",
+    "reviews": [{},{},{},{}]
+  }
+]

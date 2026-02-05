@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "title": "Semáforo Inteligente",
+    "level": "Básico",
+    "image": "https://images.unsplash.com/photo-1555664424-778a6902201b?auto=format&fit=crop&q=80&w=800",
+    "desc": "Simulación de cruce peatonal con temporizadores y lógica booleana simple.",
+    "components": ["Arduino Uno", "LED Rojo, Amarillo, Verde", "Resistencias 220Ω", "Protoboard"],
+    "code": "void setup() {\n  pinMode(13, OUTPUT);\n}\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(1000);\n  digitalWrite(13, LOW);\n  delay(1000);\n}",
+    "downloadLink": "/downloads/semaforo.zip"
+  },
+  {
+    "id": 2,
+    "title": "Radar Ultrasónico",
+    "level": "Intermedio",
+    "image": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=800",
+    "desc": "Sistema de rastreo de objetos con visualización gráfica en Processing.",
+    "components": ["Arduino Uno", "HC-SR04", "Servo SG90", "Cables Jumper"],
+    "code": "#include <Servo.h>\nServo myServo;\nvoid setup() {\n  myServo.attach(12);\n}",
+    "downloadLink": "/downloads/radar.zip"
+  },
+  {
+    "id": 3,
+    "title": "Brazo Robótico IoT",
+    "level": "Avanzado",
+    "image": "https://images.unsplash.com/photo-1611348524140-53c9a25263d6?auto=format&fit=crop&q=80&w=800",
+    "desc": "Control de 4 grados de libertad mediante WiFi usando un ESP32.",
+    "components": ["ESP32", "4x Servos MG996R", "Fuente 5V 3A", "Chasis Impreso 3D"],
+    "code": "#include <WiFi.h>\n// Código complejo del brazo robot...",
+    "downloadLink": "/downloads/brazo.zip"
+  }
+]
